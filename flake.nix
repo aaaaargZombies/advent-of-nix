@@ -10,6 +10,7 @@
     let
       lib = nixpkgs.lib;
       day01 = import ./day01.nix { inherit lib; };
+      day02 = import ./day02.nix { inherit lib; };
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -23,7 +24,7 @@
           runtimeInputs = [
           ];
           text = ''
-            					   echo ${toString (day01.part02 day01.input)}
+            					   echo ${toString (day02.part01 day02.testInput)}
           '';
         };
 
