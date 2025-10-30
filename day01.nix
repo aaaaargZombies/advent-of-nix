@@ -1,5 +1,5 @@
 { lib, ... }:
-{
+rec {
   expect01 = 24000;
 
   testInput = ''
@@ -20,12 +20,17 @@
 
   input = builtins.readFile ./input/day01.txt;
 
-  part01 =
+  part00 =
     input:
     input
     |> lib.splitString "\n\n"
     |> map (lib.splitString "\n")
     |> map (map (str: if str == "" then 0 else lib.toInt str))
-    |> builtins.map (lib.fold (a: b: a + b) 0)
-    |> lib.fold lib.max 0;
+    |> map (lib.fold (a: b: a + b) 0);
+
+  part01 = input: input |> part00 |> lib.fold lib.max 0;
+
+  part02 =
+    input: input |> part00 |> builtins.sort (a: b: a > b) |> lib.take 3 |> (lib.fold (a: b: a + b) 0);
+
 }

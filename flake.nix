@@ -23,7 +23,7 @@
           runtimeInputs = [
           ];
           text = ''
-            					   echo ${toString (day01.part01 day01.input)}
+            					   echo ${toString (day01.part02 day01.input)}
           '';
         };
 
