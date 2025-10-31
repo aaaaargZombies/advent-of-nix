@@ -21,8 +21,8 @@
     {
 
       tests.testPass = {
-        expr = 3;
-        expected = 3;
+        expr = y2022.day02.part02 y2022.day02.testInput;
+        expected = y2022.day02.expect02;
       };
 
       formatter.${system} = pkgs.nixfmt-tree;
