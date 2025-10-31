@@ -14,3 +14,4 @@ Some useful looking resources.
 - tesing libs
   - [nix-unit - Unit testing for Nix code](https://github.com/nix-community/nix-unit) last update at time of writing last month
   - [nixt - Simple unit-testing for Nix](https://github.com/nix-community/nixt) last update at time of writing last year
+- [noogle](https://noogle.dev/) function search for nix, try `lib.<???>` / `builtins.<???>`
