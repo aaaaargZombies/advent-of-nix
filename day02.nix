@@ -4,7 +4,8 @@ let
   inherit (utils) set list string;
 in
 rec {
-  expect = 15;
+  expect01 = 15;
+  expect02 = 12;
 
   testInput = ''
     		A Y
@@ -14,13 +15,22 @@ rec {
 
   input = builtins.readFile ./input/day02.txt;
 
-  decode = {
+  decode01 = {
     A = "Rock";
     B = "Paper";
     C = "Scissors";
     X = "Rock";
     Y = "Paper";
     Z = "Scissors";
+  };
+
+  decode02 = {
+    A = "Rock";
+    B = "Paper";
+    C = "Scissors";
+    X = "Lose";
+    Y = "Draw";
+    Z = "Won";
   };
 
   score = {
@@ -38,6 +48,17 @@ rec {
     "Scissors" = "Paper";
   };
 
+  loses = set.flip beats;
+
+  toolChoice =
+    oponent: goal:
+    if goal == "Draw" then
+      oponent
+    else if goal == "Won" then
+      loses.${oponent}
+    else
+      beats.${oponent};
+
   outcome =
     oponenet: player:
     if player == oponenet then
@@ -47,15 +68,34 @@ rec {
     else
       "Lose";
 
-  gameToScore =
-    a: b: (score.${outcome decode.${a} decode.${b}}) + (b |> set.getAttr decode |> (set.getAttr score));
+  gameToScore01 =
+    a: b:
+    # outcome score
+    (score.${outcome decode01.${a} decode01.${b}})
+    # tool score
+    + (b |> set.getAttr decode01 |> (set.getAttr score));
+
+  gameToScore02 =
+    a: b:
+    # outcome score
+    (b |> set.getAttr decode02 |> (set.getAttr score))
+    # tool score
+    + (score.${toolChoice decode02.${a} decode02.${b}});
 
   part01 =
     input:
     input
     |> string.lines
-    |> map (lib.splitString " ")
-    |> map (game: gameToScore (list.at 0 game) (list.at 1 game))
+    |> map (s: s |> lib.trim |> lib.splitString " ")
+    |> map (game: gameToScore01 (list.at 0 game) (list.at 1 game))
+    |> list.sum;
+
+  part02 =
+    input:
+    input
+    |> string.lines
+    |> map (s: s |> lib.trim |> lib.splitString " ")
+    |> map (game: gameToScore02 (list.at 0 game) (list.at 1 game))
     |> list.sum;
 
 }

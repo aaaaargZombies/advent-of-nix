@@ -6,6 +6,8 @@ in
 rec {
   expect01 = 24000;
 
+  expect02 = 45000;
+
   testInput = ''
     1000
     2000
