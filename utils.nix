@@ -5,7 +5,7 @@ rec {
     fold_ = f: lst: lib.fold f (at 0 lst) (lib.drop 1 lst);
     max = fold_ (a: b: lib.max a b);
     min = fold_ (a: b: lib.min a b);
-    at =  f.flip builtins.elemAt;
+    at = f.flip builtins.elemAt;
   };
 
   # combinators
