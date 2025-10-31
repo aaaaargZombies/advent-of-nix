@@ -3,10 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nix-unit.url = "github:nix-community/nix-unit";
+    nix-unit.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
-    { self, nixpkgs }:
+    { self, nixpkgs, nix-unit, ... }:
     let
       lib = nixpkgs.lib;
       y2022 = {
@@ -17,6 +19,12 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
+
+      tests.testPass = {
+        expr = 3;
+        expected = 3;
+      };
+
       formatter.${system} = pkgs.nixfmt-tree;
 
       packages.${system} = {
@@ -32,20 +40,21 @@
 
       };
 
-      # --- The test ---
-      # checks.${system}.hello-test =
-      #   pkgs.runCommand "hello-test"
-      #     {
-      #     }
-      #     ''
-      #       output=${toString (day01.part01 day01.testInput)}
-      #       if [ "$output" != ${toString day01.expect01} ]; then
-      #         echo "Unexpected output: $output"
-      #         exit 1
-      #       fi
-      #       echo "Test passed"
-      #       touch $out
-      #     '';
+      checks.${system}.default =
+        nixpkgs.legacyPackages.${system}.runCommand "tests"
+          {
+            nativeBuildInputs = [ nix-unit.packages.${system}.default ];
+          }
+          ''
+                        export HOME="$(realpath .)"
+                        # The nix derivation must be able to find all used inputs in the nix-store because it cannot download it during buildTime.
+                        nix-unit --eval-store "$HOME" \
+            						  --extra-experimental-features pipe-operators \
+                          --extra-experimental-features flakes \
+                          --override-input nixpkgs ${nixpkgs} \
+                          --flake ${self}#tests
+                        touch $out
+          '';
 
     };
 
