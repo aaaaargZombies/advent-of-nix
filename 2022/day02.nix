@@ -11,7 +11,7 @@ rec {
         C Z
   '';
 
-  input = builtins.readFile ./input/day02.txt;
+  problemInput = builtins.readFile ./input/day02.txt;
 
   decode01 = {
     A = "Rock";
@@ -107,12 +107,12 @@ rec {
   };
 
   # FIXME: > error: stack overflow (possible infinite recursion)
-  # testRealPart1 = {
-  #   expr = part01 input;
-  #   expected = 15;
-  # };
-  # testRealPart2 = {
-  #   expr = part02 input;
-  #   expected = 12;
-  # };
+  testRealPart1 = {
+    expr = part01 problemInput;
+    expected = 15;
+  };
+  testRealPart2 = {
+    expr = part02 problemInput;
+    expected = 12;
+  };
 }

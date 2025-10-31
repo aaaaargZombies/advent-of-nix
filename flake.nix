@@ -36,7 +36,7 @@
           runtimeInputs = [
           ];
           text = ''
-            					   echo ${toString (y2022.day02.part02 y2022.day02.input)}
+            					   echo ${toString (y2022.day02.part02 y2022.day02.problemInput)}
           '';
         };
 
