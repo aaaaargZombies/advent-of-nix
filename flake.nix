@@ -8,7 +8,12 @@
   };
 
   outputs =
-    { self, nixpkgs, nix-unit, ... }:
+    {
+      self,
+      nixpkgs,
+      nix-unit,
+      ...
+    }:
     let
       lib = nixpkgs.lib;
       y2022 = {
