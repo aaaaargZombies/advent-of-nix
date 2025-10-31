@@ -12,5 +12,5 @@ Some useful looking resources.
   - [ The Nix Hour #7 [source filtering, writing package tests] ](https://www.youtube.com/watch?v=mOQI9Iiu4Uc&list=PLyzwHTVJlRc8yjlx4VR4LU5A5O44og9in&index=76)
 - many other useful looking vids in the Nix Hour playlist
 - tesing libs
-  - [nix-unit - Unit testing for Nix code](https://github.com/nix-community/nixt) last update at time of writing last month
+  - [nix-unit - Unit testing for Nix code](https://github.com/nix-community/nix-unit) last update at time of writing last month
   - [nixt - Simple unit-testing for Nix](https://github.com/nix-community/nixt) last update at time of writing last year
