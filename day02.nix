@@ -1,6 +1,7 @@
 { lib, ... }:
 let
   utils = import ./utils.nix { inherit lib; };
+  inherit (utils) set list string;
 in
 rec {
   expect = 15;
@@ -47,18 +48,14 @@ rec {
       "Lose";
 
   gameToScore =
-    a: b:
-    (score.${outcome decode.${a} decode.${b}})
-    + (b |> utils.set.getAttr decode |> (utils.set.getAttr score));
+    a: b: (score.${outcome decode.${a} decode.${b}}) + (b |> set.getAttr decode |> (set.getAttr score));
 
   part01 =
     input:
     input
-    |> lib.trim
-    |> lib.splitString "\n"
-    |> map lib.trim
+    |> string.lines
     |> map (lib.splitString " ")
-    |> map (game: gameToScore (builtins.elemAt game 0) (builtins.elemAt game 1))
-    |> utils.list.sum;
+    |> map (game: gameToScore (list.at 0 game) (list.at 1 game))
+    |> list.sum;
 
 }
