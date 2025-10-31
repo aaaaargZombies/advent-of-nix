@@ -1,4 +1,7 @@
 { lib, ... }:
+let
+  utils = import ./utils.nix { inherit lib; };
+in
 rec {
   expect = 15;
 
@@ -10,20 +13,44 @@ rec {
 
   input = builtins.readFile ./input/day02.txt;
 
-  decode =
-      {
-        A = "Rock";
-        B = "Paper";
-        C = "Scissors";
-        Y = "Rock";
-        X = "Paper";
-        Z = "Scissors";
-      };
+  decode = {
+    A = "Rock";
+    B = "Paper";
+    C = "Scissors";
+    X = "Rock";
+    Y = "Paper";
+    Z = "Scissors";
+  };
 
-  # gameToScore = a: b: decode a + decode b ;
-  gameToScore = a: b: decode.${a} + decode.${b} ;
+  score = {
+    "Rock" = 1;
+    "Paper" = 2;
+    "Scissors" = 3;
+    "Lose" = 0;
+    "Draw" = 3;
+    "Won" = 6;
+  };
 
-  # this is not a doc string?
+  beats = {
+    "Rock" = "Scissors";
+    "Paper" = "Rock";
+    "Scissors" = "Paper";
+  };
+
+  outcome =
+    oponenet: player:
+    if player == oponenet then
+      "Draw"
+    else if beats.${player} == oponenet then
+      "Won"
+    else
+      "Lose";
+
+  gameToScore =
+    a: b:
+    (score.${outcome decode.${a} decode.${b}})
+    + (b |> utils.set.getAttr decode |> (utils.set.getAttr score));
+
   part01 =
     input:
     input
@@ -31,10 +58,7 @@ rec {
     |> lib.splitString "\n"
     |> map lib.trim
     |> map (lib.splitString " ")
-    # |> map (builtins.stringLength)
     |> map (game: gameToScore (builtins.elemAt game 0) (builtins.elemAt game 1))
-  # |> map (map (str: if str == "" then 0 else lib.toInt str))
-  # |> map (lib.fold (a: b: a + b) 0)
-  ;
+    |> utils.list.sum;
 
 }
