@@ -4,10 +4,8 @@ let
   inherit (utils) set list string;
 in
 rec {
-  expect01 = 15;
-  expect02 = 12;
 
-  testInput = ''
+  sampleInput = ''
     		A Y
         B X
         C Z
@@ -98,4 +96,23 @@ rec {
     |> map (game: gameToScore02 (list.at 0 game) (list.at 1 game))
     |> list.sum;
 
+  testPart1 = {
+    expr = part01 sampleInput;
+    expected = 15;
+  };
+
+  testPart2 = {
+    expr = part02 sampleInput;
+    expected = 12;
+  };
+
+  # FIXME: > error: stack overflow (possible infinite recursion)
+  # testRealPart1 = {
+  #   expr = part01 input;
+  #   expected = 15;
+  # };
+  # testRealPart2 = {
+  #   expr = part02 input;
+  #   expected = 12;
+  # };
 }

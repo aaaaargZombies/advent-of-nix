@@ -4,11 +4,8 @@ let
   inherit (utils) list string;
 in
 rec {
-  expect01 = 24000;
 
-  expect02 = 45000;
-
-  testInput = ''
+  sampleInput = ''
     1000
     2000
     3000
@@ -37,5 +34,15 @@ rec {
   part01 = input: input |> part00 |> list.max;
 
   part02 = input: input |> part00 |> builtins.sort (a: b: a > b) |> lib.take 3 |> list.sum;
+
+  testPart1 = {
+    expr = part01 sampleInput;
+    expected = 24000;
+  };
+
+  testPart2 = {
+    expr = part02 sampleInput;
+    expected = 45000;
+  };
 
 }
