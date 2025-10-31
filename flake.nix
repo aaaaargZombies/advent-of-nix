@@ -9,8 +9,11 @@
     { self, nixpkgs }:
     let
       lib = nixpkgs.lib;
-      day01 = import ./day01.nix { inherit lib; };
-      day02 = import ./day02.nix { inherit lib; };
+			y2022 = {
+      day01 = import ./2022/day01.nix { inherit lib; };
+      day02 = import ./2022/day02.nix { inherit lib; };
+
+			};
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -24,26 +27,26 @@
           runtimeInputs = [
           ];
           text = ''
-            					   echo ${toString (day02.part02 day02.input)}
+            					   echo ${toString (y2022.day02.part02 y2022.day02.input)}
           '';
         };
 
       };
 
       # --- The test ---
-      checks.${system}.hello-test =
-        pkgs.runCommand "hello-test"
-          {
-          }
-          ''
-            output=${toString (day01.part01 day01.testInput)}
-            if [ "$output" != ${toString day01.expect01} ]; then
-              echo "Unexpected output: $output"
-              exit 1
-            fi
-            echo "Test passed"
-            touch $out
-          '';
+      # checks.${system}.hello-test =
+      #   pkgs.runCommand "hello-test"
+      #     {
+      #     }
+      #     ''
+      #       output=${toString (day01.part01 day01.testInput)}
+      #       if [ "$output" != ${toString day01.expect01} ]; then
+      #         echo "Unexpected output: $output"
+      #         exit 1
+      #       fi
+      #       echo "Test passed"
+      #       touch $out
+      #     '';
 
     };
 

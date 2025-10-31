@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  utils = import ./utils.nix { inherit lib; };
+  utils = import ../utils.nix { inherit lib; };
   inherit (utils) set list string;
 in
 rec {
