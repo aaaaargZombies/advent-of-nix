@@ -20,9 +20,20 @@
     in
     {
 
-      tests.testPass = {
-        expr = y2022.day02.part02 y2022.day02.testInput;
-        expected = y2022.day02.expect02;
+      tests = {
+        y2022 = {
+          day02 = {
+            test01 = {
+              expr = y2022.day02.part01 y2022.day02.testInput;
+              expected = y2022.day02.expect01;
+            };
+            test02 = {
+              expr = y2022.day02.part02 y2022.day02.testInput;
+              expected = y2022.day02.expect02;
+            };
+          };
+        };
+
       };
 
       formatter.${system} = pkgs.nixfmt-tree;
