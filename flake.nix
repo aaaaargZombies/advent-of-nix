@@ -12,7 +12,6 @@
       y2022 = {
         day01 = import ./2022/day01.nix { inherit lib; };
         day02 = import ./2022/day02.nix { inherit lib; };
-
       };
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
