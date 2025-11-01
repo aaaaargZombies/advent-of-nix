@@ -31,10 +31,9 @@
         show_ = pkgs.writeShellApplication {
           # create age public key for use with sops-nix
           name = "show";
-          runtimeInputs = [
-          ];
+          runtimeInputs = [ ];
           text = ''
-            					   echo ${toString ("hold")}
+            echo ${toString ("hold")}
           '';
         };
 
