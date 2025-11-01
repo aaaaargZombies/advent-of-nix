@@ -1,6 +1,16 @@
 # Advent Of Code in Nix
 
-An expleration of nix the lang as I've only really used it to manage system deps for the odd dev shell.
+An exploration of nix the lang as I've only really used it to manage system deps for the odd dev shell.
+
+## running
+
+```sh
+nix flake check --print-build-logs
+```
+
+Note this runs by building the checks output, so if nothing changes you won't see any output on the build.
+
+## resources
 
 Some useful looking resources.
 
@@ -14,4 +24,6 @@ Some useful looking resources.
 - tesing libs
   - [nix-unit - Unit testing for Nix code](https://github.com/nix-community/nix-unit) last update at time of writing last month
   - [nixt - Simple unit-testing for Nix](https://github.com/nix-community/nixt) last update at time of writing last year
+  - both seem to be part of `nix-community` org
+  - there is also [namaka - Snapshot testing for Nix based on haumea](https://github.com/nix-community/namaka) which might make sense as a workflow for wworking through the parsing parts but looks a bit more involved to set up.
 - [noogle](https://noogle.dev/) function search for nix, try `lib.<???>` / `builtins.<???>`
