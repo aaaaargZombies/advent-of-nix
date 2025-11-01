@@ -45,4 +45,13 @@ rec {
     expected = 45000;
   };
 
+  testRealPart1 = {
+    expr = part01 input;
+    expected = 69177;
+  };
+  testRealPart2 = {
+    expr = part02 input;
+    expected = 207456;
+  };
+
 }
