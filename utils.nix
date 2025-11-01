@@ -29,4 +29,38 @@ rec {
     chunks = str: str |> lib.trim |> lib.splitString "\n\n";
   };
 
+  makeDayTest =
+    {
+      sampleInput ? "",
+      input ? "",
+      expect01 ? "",
+      part01 ? (a: a),
+      expect02 ? "",
+      part02 ? (a: a),
+      expectReal01 ? "",
+      expectReal02 ? "",
+      ...
+    }:
+    {
+      testPart01 = {
+        expr = part01 sampleInput;
+        expected = expect01;
+      };
+
+      testPart02 = {
+        expr = part02 sampleInput;
+        expected = expect02;
+      };
+
+      testPartReal01 = {
+        expr = part01 input;
+        expected = expectReal01;
+      };
+      testPartReal02 = {
+        expr = part02 input;
+        expected = expectReal02;
+      };
+
+    };
+
 }

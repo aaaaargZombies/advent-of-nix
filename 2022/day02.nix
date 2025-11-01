@@ -11,6 +11,11 @@ rec {
         C Z
   '';
 
+  expect01 = 15;
+  expect02 = 12;
+  expectReal01 = 13052;
+  expectReal02 = 13693;
+
   input = builtins.readFile ./input/day02.txt;
 
   decode01 = {
@@ -96,22 +101,4 @@ rec {
     |> map (game: gameToScore02 (list.at 0 game) (list.at 1 game))
     |> list.sum;
 
-  testPart1 = {
-    expr = part01 sampleInput;
-    expected = 15;
-  };
-
-  testPart2 = {
-    expr = part02 sampleInput;
-    expected = 12;
-  };
-
-  testRealPart1 = {
-    expr = part01 input;
-    expected = 13052;
-  };
-  testRealPart2 = {
-    expr = part02 input;
-    expected = 13693;
-  };
 }

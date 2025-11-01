@@ -21,6 +21,11 @@ rec {
 
     10000'';
 
+  expect01 = 24000;
+  expect02 = 45000;
+  expectReal01 = 69177;
+  expectReal02 = 207456;
+
   input = builtins.readFile ./input/day01.txt;
 
   part00 =
@@ -34,24 +39,5 @@ rec {
   part01 = input: input |> part00 |> list.max;
 
   part02 = input: input |> part00 |> builtins.sort (a: b: a > b) |> lib.take 3 |> list.sum;
-
-  testPart1 = {
-    expr = part01 sampleInput;
-    expected = 24000;
-  };
-
-  testPart2 = {
-    expr = part02 sampleInput;
-    expected = 45000;
-  };
-
-  testRealPart1 = {
-    expr = part01 input;
-    expected = 69177;
-  };
-  testRealPart2 = {
-    expr = part02 input;
-    expected = 207456;
-  };
 
 }
