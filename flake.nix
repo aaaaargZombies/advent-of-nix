@@ -20,7 +20,6 @@
 
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      utils = import ./utils.nix { inherit lib; };
     in
     {
 
@@ -35,7 +34,7 @@
           runtimeInputs = [
           ];
           text = ''
-            					   echo ${toString (y2022.day02.part02 y2022.day02.input)}
+            					   echo ${toString ("hold")}
           '';
         };
 

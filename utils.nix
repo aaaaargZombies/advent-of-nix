@@ -2,31 +2,46 @@
 rec {
   list = rec {
     sum = builtins.foldl' (a: b: a + b) 0;
+
     fold_ = f: lst: builtins.foldl' f (at 0 lst) (lib.drop 1 lst);
+
     max = fold_ (a: b: lib.max a b);
+
     min = fold_ (a: b: lib.min a b);
+
     at = f.flip builtins.elemAt;
   };
 
   # combinators
   f = {
     apply = a: f: f a;
+
     flip =
       f: a: b:
       f b a;
   };
 
-  trace = str: a: builtins.trace "${str}: ${builtins.toString a}" a;
+  trace = str: a: builtins.trace "${str}: ${builtins.toJSON a}" a;
 
   set = {
     getAttr = f.flip builtins.getAttr;
+
     flip =
       set: set |> builtins.attrNames |> lib.fold (name: acc: { ${set.${name}} = name; } // acc) { };
   };
 
   string = {
     lines = str: str |> lib.trim |> lib.splitString "\n";
+
     chunks = str: str |> lib.trim |> lib.splitString "\n\n";
+
+    startsWith =
+      sub: str:
+      let
+        to = builtins.stringLength sub;
+        start = builtins.substring 0 to str;
+      in
+      sub == start;
   };
 
   makeDayTest =
@@ -60,7 +75,5 @@ rec {
         expr = part02 input;
         expected = expectReal02;
       };
-
     };
-
 }
