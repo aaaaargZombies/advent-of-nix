@@ -12,6 +12,35 @@ rec {
     at = f.flip builtins.elemAt;
 
     uncons = lst: tuple.pair (builtins.head lst) (lib.lists.drop 1 lst);
+
+    chunk =
+      n: lst:
+      let
+        doChunk =
+          acc: n: lst:
+          if (builtins.length lst) < n then
+            acc
+          else
+            let
+              head = lib.lists.take n lst;
+              tail = lib.lists.drop n lst;
+            in
+            doChunk (acc ++ [ head ]) n tail;
+      in
+      doChunk [ ] n lst;
+
+    sharedElements =
+      listOfLists:
+      if builtins.length listOfLists < 2 then
+        [ ]
+      else
+        let
+          head = at 0 listOfLists;
+          tail = lib.lists.drop 1 listOfLists;
+        in
+        builtins.foldl' (
+          acc: el: if (builtins.all (lst: builtins.elem el lst) tail) then ([ el ] ++ acc) else acc
+        ) [ ] head;
   };
 
   # combinators
@@ -77,6 +106,13 @@ rec {
       };
 
     fromList = lst: tuple.pair (list.at 0 lst) (list.at 1 lst);
+
+    toList =
+      { left, right }:
+      [
+        left
+        right
+      ];
   };
 
   makeDayTest =
