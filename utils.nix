@@ -10,6 +10,8 @@ rec {
     min = fold_ (a: b: lib.min a b);
 
     at = f.flip builtins.elemAt;
+
+    uncons = lst: tuple.pair (builtins.head lst) (lib.lists.drop 1 lst);
   };
 
   # combinators
@@ -42,6 +44,39 @@ rec {
         start = builtins.substring 0 to str;
       in
       sub == start;
+  };
+
+  tuple = {
+    pair = l: r: {
+      left = l;
+      right = r;
+    };
+
+    mapLeft =
+      f:
+      { left, right }:
+      {
+        left = f left;
+        right = right;
+      };
+
+    mapRight =
+      f:
+      { left, right }:
+      {
+        left = left;
+        right = f right;
+      };
+
+    mapBoth =
+      fLeft: fRight:
+      { left, right }:
+      {
+        left = fLeft left;
+        right = fRight right;
+      };
+
+    fromList = lst: tuple.pair (list.at 0 lst) (list.at 1 lst);
   };
 
   makeDayTest =
