@@ -40,7 +40,7 @@
       };
 
       checks.${system}.default =
-        nixpkgs.legacyPackages.${system}.runCommand "tests"
+        pkgs.runCommand "tests"
           {
             nativeBuildInputs = [ nix-unit.packages.${system}.default ];
           }
