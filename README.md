@@ -28,5 +28,5 @@ Some useful looking resources.
   - [nix-unit - Unit testing for Nix code](https://github.com/nix-community/nix-unit) last update at time of writing last month
   - [nixt - Simple unit-testing for Nix](https://github.com/nix-community/nixt) last update at time of writing last year
   - both seem to be part of `nix-community` org
-  - there is also [namaka - Snapshot testing for Nix based on haumea](https://github.com/nix-community/namaka) which might make sense as a workflow for wworking through the parsing parts but looks a bit more involved to set up.
+  - there is also [namaka - Snapshot testing for Nix based on haumea](https://github.com/nix-community/namaka) which might make sense as a workflow for working through the parsing parts but looks a bit more involved to set up.
 - [noogle](https://noogle.dev/) function search for nix, try `lib.<???>` / `builtins.<???>`
