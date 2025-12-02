@@ -81,6 +81,10 @@ rec {
       right = r;
     };
 
+    fst = { left, right }: left;
+
+    snd = { left, right }: right;
+
     mapLeft =
       f:
       { left, right }:
@@ -113,6 +117,22 @@ rec {
         left
         right
       ];
+
+  };
+
+  math = {
+    abs = n: if n >= 0 then n else (-n);
+
+    remainder =
+      div: n:
+      let
+        fits = n / div;
+        takes = div * fits;
+        remains = n - takes;
+      in
+      remains;
+
+    mod = b: n: lib.mod b n |> (x: if x < 0 then x + n else x);
   };
 
   makeDayTest =

@@ -16,14 +16,17 @@
     }:
     let
       lib = nixpkgs.lib;
-      y2022 = import ./2022/year.nix { inherit lib; };
+      # y2022 = import ./2022/year.nix { inherit lib; };
+      y2025 = import ./2025/year.nix { inherit lib; };
+
+      day01 = import ./2025/day01.nix { inherit lib; };
 
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
 
-      tests = y2022;
+      tests = y2025;
 
       formatter.${system} = pkgs.nixfmt-tree;
 
@@ -32,8 +35,11 @@
           # create age public key for use with sops-nix
           name = "show";
           runtimeInputs = [ ];
+          # NOTE: changing from `day01.input` to `day01.sampleInput` let my checks run with
+          # without a stack overflow!? why would this work????
+          # if nix is lazy and I'm not running this then it shouldn't be evaluated, I think!
           text = ''
-            echo ${toString ("hold")}
+            echo ${toString (day01.part01 day01.sampleInput)} 
           '';
         };
 
