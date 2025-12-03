@@ -47,7 +47,12 @@ rec {
         false
     );
 
-  numberRepeatsAny = n: n |> toString |> lib.stringToCharacters |> (chars : doElemsRepeat 1  (builtins.length chars) false chars) ;
+  numberRepeatsAny =
+    n:
+    n
+    |> toString
+    |> lib.stringToCharacters
+    |> (chars: doElemsRepeat 1 (builtins.length chars) false chars);
 
   doElemsRepeat =
     subLength: listLength: acc: elems:

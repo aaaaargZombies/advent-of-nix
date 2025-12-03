@@ -14,8 +14,8 @@ rec {
     uncons = lst: tuple.pair (builtins.head lst) (lib.lists.drop 1 lst);
 
     /**
-		split a list into sublists, dropping any remainder
-		*/
+      		split a list into sublists, dropping any remainder
+    */
     chunk =
       n: lst:
       let
@@ -33,18 +33,18 @@ rec {
       doChunk [ ] n lst;
 
     /**
-		split a list into sublists, retaining remainder in a shorter sublist
-		*/
+      		split a list into sublists, retaining remainder in a shorter sublist
+    */
     chunk' =
       n: lst:
       let
         doChunk =
           acc: n: lst:
           if (builtins.length lst) < n then
-						if (builtins.length lst) > 0 then
-							(acc ++ [ lst ])  # getting an empty list at the end of each
-						else
-						  acc
+            if (builtins.length lst) > 0 then
+              (acc ++ [ lst ]) # getting an empty list at the end of each
+            else
+              acc
           else
             let
               head = lib.lists.take n lst;
@@ -68,31 +68,31 @@ rec {
         ) [ ] head;
 
     /**
-		# Examples
+      		# Examples
 
-		```nix
-		nix-repl> u.list.homogenous []
-		true
+      		```nix
+      		nix-repl> u.list.homogenous []
+      		true
 
-		nix-repl> u.list.homogenous [1]
-		true
+      		nix-repl> u.list.homogenous [1]
+      		true
 
-		nix-repl> u.list.homogenous [1 1]
-		true
+      		nix-repl> u.list.homogenous [1 1]
+      		true
 
-		nix-repl> u.list.homogenous [1 2]
-		false
-		```
-		*/
+      		nix-repl> u.list.homogenous [1 2]
+      		false
+      		```
+    */
     homogenous =
       lst:
-			if builtins.length == 0 then
-			  true
-			else
-      builtins.foldl' (
-        { left, right }: el: if left == false then tuple.pair false {} else tuple.pair (right == el) el
-      ) (tuple.pair true (at 0 lst)) (lib.drop 1 lst)
-      |> tuple.fst;
+      if builtins.length == 0 then
+        true
+      else
+        builtins.foldl' (
+          { left, right }: el: if left == false then tuple.pair false { } else tuple.pair (right == el) el
+        ) (tuple.pair true (at 0 lst)) (lib.drop 1 lst)
+        |> tuple.fst;
   };
 
   # combinators
