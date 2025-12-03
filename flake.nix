@@ -19,7 +19,7 @@
       # y2022 = import ./2022/year.nix { inherit lib; };
       y2025 = import ./2025/year.nix { inherit lib; };
 
-      day01 = import ./2025/day01.nix { inherit lib; };
+      day02 = import ./2025/day02.nix { inherit lib; };
 
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -39,7 +39,7 @@
           # without a stack overflow!? why would this work????
           # if nix is lazy and I'm not running this then it shouldn't be evaluated, I think!
           text = ''
-            echo ${toString (day01.part01 day01.sampleInput)} 
+            echo ${toString (day02.part02 day02.input)} 
           '';
         };
 
