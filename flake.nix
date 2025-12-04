@@ -35,11 +35,8 @@
           # create age public key for use with sops-nix
           name = "show";
           runtimeInputs = [ ];
-          # NOTE: changing from `day01.input` to `day01.sampleInput` let my checks run with
-          # without a stack overflow!? why would this work????
-          # if nix is lazy and I'm not running this then it shouldn't be evaluated, I think!
           text = ''
-            echo ${toString (day03.part01 day03.input)} 
+            echo ${toString (day03.part02 day03.sampleInput)} 
           '';
         };
 

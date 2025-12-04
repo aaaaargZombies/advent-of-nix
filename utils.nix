@@ -68,6 +68,8 @@ rec {
         ) [ ] head;
 
     /**
+      		Are all elements equal?
+
       		# Examples
 
       		```nix
@@ -170,6 +172,28 @@ rec {
         right
       ];
 
+  };
+
+  tripple = rec {
+    triplet = l: m: r: {
+      left = l;
+      mid = m;
+      right = r;
+    };
+
+    fromList = lst: triplet (list.at 0 lst) (list.at 1 lst) (list.at 2 lst);
+
+    toList =
+      {
+        left,
+        mid,
+        right,
+      }:
+      [
+        left
+        mid
+        right
+      ];
   };
 
   math = {
