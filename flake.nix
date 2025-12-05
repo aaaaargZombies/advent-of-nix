@@ -19,7 +19,7 @@
       # y2022 = import ./2022/year.nix { inherit lib; };
       y2025 = import ./2025/year.nix { inherit lib; };
 
-      day04 = import ./2025/day04.nix { inherit lib; };
+      day05 = import ./2025/day05.nix { inherit lib; };
 
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -36,7 +36,7 @@
           name = "show";
           runtimeInputs = [ ];
           text = ''
-            echo ${toString (day04.part02 day04.input)} 
+            echo ${toString (day05.part01 day05.sampleInput)} 
           '';
         };
 
