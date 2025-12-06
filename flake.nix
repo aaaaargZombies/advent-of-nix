@@ -31,7 +31,7 @@
       formatter.${system} = pkgs.nixfmt-tree;
 
       packages.${system} = {
-        show_ = pkgs.writeShellApplication {
+        show = pkgs.writeShellApplication {
           # create age public key for use with sops-nix
           name = "show";
           runtimeInputs = [ ];
