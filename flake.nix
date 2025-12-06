@@ -36,7 +36,7 @@
           name = "show";
           runtimeInputs = [ ];
           text = ''
-            echo ${toString (day05.part02 day05.input)} 
+            echo ${builtins.toJSON (day05.part02 day05.input)} 
           '';
         };
 
