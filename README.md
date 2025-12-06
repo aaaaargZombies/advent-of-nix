@@ -12,6 +12,11 @@ nix flake check --print-build-logs
 
 Note this runs by building the checks output, so if nothing changes you won't see any output on the build.
 
+> [!WARNING]
+> Some of the solutions are not well optimized and running the whole test suite is expected to be annoyingly slow
+>
+> update the `show` package to run a single problem
+
 ## resources
 
 Some useful looking resources.
