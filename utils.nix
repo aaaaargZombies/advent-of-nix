@@ -31,6 +31,24 @@ rec {
         acc: x: y:
         acc ++ [ (f x y) ]
       ) [ ] xs ys;
+
+    /**
+      	[123]
+      	[456]
+      	[789]
+        ->
+      	[147]
+        [258]
+        [369}
+    */
+    rotate =
+      xss:
+      let
+        width = builtins.length (builtins.elemAt xss 0);
+        collumns = builtins.genList (a: [ ]) width;
+      in
+      builtins.foldl' (acc: row: list.map2 (col: el: col ++ [ el ]) acc row) collumns xss;
+
     /**
       		split a list into sublists, dropping any remainder
     */

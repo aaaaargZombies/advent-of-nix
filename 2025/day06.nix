@@ -12,14 +12,6 @@ rec {
     *   +   *   +  
   '';
 
-  rotate =
-    xss:
-    let
-      width = builtins.length (builtins.elemAt xss 0);
-      collumns = builtins.genList (a: [ ]) width;
-    in
-    builtins.foldl' (acc: row: list.map2 (col: el: col ++ [ el ]) acc row) collumns xss;
-
   expect01 = 4277556;
   expect02 = 3263827;
   expectReal01 = 5873191732773;
@@ -102,7 +94,7 @@ rec {
         ns =
           lib.take (len - 1) xs
           |> map lib.stringToCharacters
-          |> rotate
+          |> list.rotate
           |> map (builtins.filter (a: a != " "))
           |> map (lib.join "")
           |> (lib.join "\n")
