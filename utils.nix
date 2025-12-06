@@ -13,6 +13,24 @@ rec {
 
     uncons = lst: tuple.pair (builtins.head lst) (lib.lists.drop 1 lst);
 
+    foldl2 =
+      f: acc: xs: ys:
+      builtins.foldl' (
+        { left, right }:
+        x:
+        let
+          y = builtins.elemAt ys left;
+        in
+        tuple.pair (left + 1) (f right x y)
+      ) (tuple.pair 0 acc) xs
+      |> tuple.snd;
+
+    map2 =
+      f: xs: ys:
+      foldl2 (
+        acc: x: y:
+        acc ++ [ (f x y) ]
+      ) [ ] xs ys;
     /**
       		split a list into sublists, dropping any remainder
     */
