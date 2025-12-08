@@ -1,7 +1,12 @@
 { lib, ... }:
 let
   utils = import ../utils.nix { inherit lib; };
-  inherit (utils) string list tuple;
+  inherit (utils)
+    string
+    list
+    tuple
+    math
+    ;
 in
 rec {
 
@@ -35,7 +40,28 @@ rec {
 
   # input = builtins.readFile ./input/day08.txt;
 
-  parseInput = str: str;
+  toVec =
+    str:
+    str
+    |> lib.splitString ","
+    |> map lib.toIntBase10
+    |> (xyz: {
+      x = list.at 0 xyz;
+      y = list.at 1 xyz;
+      z = list.at 2 xyz;
+    });
+
+  parseInput = str: str |> string.lines |> map toVec;
+
+  distance =
+    a: b:
+    let
+      x2 = math.square (b.x - a.x);
+      y2 = math.square (b.y - a.y);
+      z2 = math.square (b.z - a.z);
+      sum = x2 + y2 + z2;
+    in
+    math.sqrt sum;
 
   part01 = input: input;
 

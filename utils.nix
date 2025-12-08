@@ -232,7 +232,7 @@ rec {
       ];
   };
 
-  math = {
+  math = rec {
     abs = n: if n >= 0 then n else (-n);
 
     remainder =
@@ -245,6 +245,16 @@ rec {
       remains;
 
     mod = b: n: lib.mod b n |> (x: if x < 0 then x + n else x);
+
+    square = n: n * n;
+
+    sqrt =
+      number:
+      let
+        iterate =
+          n: guess: if abs (guess * guess - n) < 0.0001 then guess else iterate n ((guess + n / guess) / 2);
+      in
+      iterate number 1.0;
   };
 
   makeDayTest =
