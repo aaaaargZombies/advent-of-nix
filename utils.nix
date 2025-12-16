@@ -131,6 +131,24 @@ rec {
           { left, right }: el: if left == false then tuple.pair false { } else tuple.pair (right == el) el
         ) (tuple.pair true (at 0 lst)) (lib.drop 1 lst)
         |> tuple.fst;
+
+    combinations =
+      n: xs:
+      if n == 0 then
+        [ [ ] ]
+      else if xs == [ ] then
+        [ ]
+      else
+        let
+          head = builtins.head xs;
+          tail = builtins.tail xs;
+
+          withHead = builtins.map (ys: [ head ] ++ ys) (combinations (n - 1) tail);
+
+          withoutHead = combinations n tail;
+        in
+        withHead ++ withoutHead;
+
   };
 
   # combinators
@@ -149,6 +167,8 @@ rec {
 
     flip =
       set: set |> builtins.attrNames |> lib.fold (name: acc: { ${set.${name}} = name; } // acc) { };
+
+		size = set: set |> builtins.attrNames |> builtins.length;
   };
 
   string = {
