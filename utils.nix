@@ -168,7 +168,7 @@ rec {
     flip =
       set: set |> builtins.attrNames |> lib.fold (name: acc: { ${set.${name}} = name; } // acc) { };
 
-		size = set: set |> builtins.attrNames |> builtins.length;
+    size = set: set |> builtins.attrNames |> builtins.length;
   };
 
   string = {

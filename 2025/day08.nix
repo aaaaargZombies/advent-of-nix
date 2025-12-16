@@ -163,14 +163,14 @@ rec {
     	  ]
   */
 
-	countTree = key: tree:
-	   if tree.${key} == tree then
-		   0
-		 else
-		  # this can cause a loop because there is not a guarentee that there is a bottom 
-			# a -> b -> c -> a
-		  1 + (countTree tree.${key} tree); 
-
+  countTree =
+    key: tree:
+    if tree.${key} == tree then
+      0
+    else
+      # this can cause a loop because there is not a guarentee that there is a bottom
+      # a -> b -> c -> a
+      1 + (countTree tree.${key} tree);
 
   pairsToCircuits' =
     tree: xss:
@@ -185,10 +185,8 @@ rec {
     # builtins.foldl' (acc: {name, value}: merge name value acc ) firstPass (lib.attrsToList firstPass);
     builtins.foldl' (acc: { left, right }: merge left right (utils.trace "MERGING" acc)) tree vecs;
 
-	countCircuits = tree:
-	tree
-	|> builtins.attrNames
-	|> builtins.foldl' (acc: key:  acc ++ [ (countTree key tree) ] ) [] ;
+  countCircuits =
+    tree: tree |> builtins.attrNames |> builtins.foldl' (acc: key: acc ++ [ (countTree key tree) ]) [ ];
 
   # NOTE: just make a normal tree?
 
@@ -203,47 +201,40 @@ rec {
   */
 
   vecsToTree =
-    xs:
-    xs
-    |> builtins.map (vec: lib.nameValuePair (builtins.toJSON vec) [] )
-    |> builtins.listToAttrs
-		;
+    xs: xs |> builtins.map (vec: lib.nameValuePair (builtins.toJSON vec) [ ]) |> builtins.listToAttrs;
 
-	countCircuitSize = vec: tree:
-	let
-	  children = tree.${vec};
-	in 
-	  if tree.${vec} == [] then
-		  1
-		else
-		  children
-			|> builtins.map (child: countCircuitSize child tree)
-			|> list.sum
-			|> (sum: sum + 1);
-	
-	addConnection = tree: {left,right}:
-	  let
-			children = tree.${left};
-	  in 
-		if builtins.elem right children then
-		  tree
-		else
-		 tree // { ${left} = (children ++ [right]);};
+  countCircuitSize =
+    vec: tree:
+    let
+      children = tree.${vec};
+    in
+    if tree.${vec} == [ ] then
+      1
+    else
+      children |> builtins.map (child: countCircuitSize child tree) |> list.sum |> (sum: sum + 1);
 
+  addConnection =
+    tree:
+    { left, right }:
+    let
+      children = tree.${left};
+    in
+    if builtins.elem right children then tree else tree // { ${left} = (children ++ [ right ]); };
 
+  createCircuits =
+    connections: tree:
+    let
+      stringified =
+        connections |> builtins.map (xs: xs |> builtins.map builtins.toJSON |> tuple.fromList);
+    in
+    builtins.foldl' addConnection tree stringified;
 
-  createCircuits = connections: tree:
-	   let
-	     stringified = connections |> builtins.map (xs: xs |> builtins.map builtins.toJSON |> tuple.fromList);
-	   in 
-	   builtins.foldl' addConnection tree stringified;
-	  
-
-  allSizes = tree:
-	  let
-	    vecs = builtins.attrNames tree;
-	  in 
-		builtins.foldl' (counts: vec: counts ++ [ (countCircuitSize vec tree) ]) [] vecs;
+  allSizes =
+    tree:
+    let
+      vecs = builtins.attrNames tree;
+    in
+    builtins.foldl' (counts: vec: counts ++ [ (countCircuitSize vec tree) ]) [ ] vecs;
 
   /*
         - find 10 shortest connections
@@ -256,7 +247,12 @@ rec {
   # part01 = input: input |> parseInput |> closest10 |> pairsToCicuits |> (circs: circs |> map (c: c|> lib.flatten |> lib.unique |> builtins.length)) ;
   part01 =
     input:
-    input |> parseInput |> (vs: createCircuits ( closest10 vs) (vecsToTree vs)) |> utils.trace "CIRCUITS!!!" |> allSizes |> builtins.sort (a: b: a > b) ;
+    input
+    |> parseInput
+    |> (vs: createCircuits (closest10 vs) (vecsToTree vs))
+    |> utils.trace "CIRCUITS!!!"
+    |> allSizes
+    |> builtins.sort (a: b: a > b);
   # part01 = input: input |> parseInput |> closest10 |> pairsToCicuits ;
 
   part02 = input: input;
