@@ -19,7 +19,7 @@
       # y2022 = import ./2022/year.nix { inherit lib; };
       y2025 = import ./2025/year.nix { inherit lib; };
 
-      day08 = import ./2025/day08.nix { inherit lib; };
+      day09 = import ./2025/day09.nix { inherit lib; };
 
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -36,7 +36,7 @@
           name = "show";
           runtimeInputs = [ ];
           text = ''
-            echo ${builtins.toJSON (day08.part01 day08.sampleInput)} 
+            echo ${builtins.toJSON (day09.part01 day09.sampleInput)} 
           '';
         };
 
