@@ -162,13 +162,15 @@ rec {
 
   trace = str: a: builtins.trace "${str}: ${builtins.toJSON a}" a;
 
-  set = {
+  set = rec {
     getAttr = f.flip builtins.getAttr;
 
     flip =
       set: set |> builtins.attrNames |> lib.fold (name: acc: { ${set.${name}} = name; } // acc) { };
 
     size = set: set |> builtins.attrNames |> builtins.length;
+
+    intersect = a: b: builtins.intersectAttrs a b |> size |> (s: s > 0);
   };
 
   string = {
