@@ -136,8 +136,8 @@ rec {
     |> builtins.sort (a: b: a > b)
     |> lib.take 3
     |> builtins.foldl' (acc: n: acc * n) 1
-    # |> trace "LAST PART"
-		;
+  # |> trace "LAST PART"
+  ;
 
   part02 = input: input;
 
