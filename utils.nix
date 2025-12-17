@@ -151,6 +151,10 @@ rec {
 
   };
 
+  bool = {
+    not = b: !b;
+  };
+
   # combinators
   f = {
     apply = a: f: f a;
@@ -267,6 +271,12 @@ rec {
       remains;
 
     mod = b: n: lib.mod b n |> (x: if x < 0 then x + n else x);
+
+    isEven = n: mod n 2 == 0;
+
+		toFloat = n: n + 0.0;
+
+		div0 = n: d: if d == 0 then 0 else n / d;
 
     square = n: n * n;
 
