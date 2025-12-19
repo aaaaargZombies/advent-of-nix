@@ -144,9 +144,9 @@ rec {
     |> (a: a.left ++ a.right);
 
   # FIX: building the board is what is extremely slow
-	#  it is 98219 long on it's y axis!
-	#  I am checking everything in the square against the board which is duplicate work
-	#  I should just run the board building check on the square and not build the board!?
+  #  it is 98219 long on it's y axis!
+  #  I am checking everything in the square against the board which is duplicate work
+  #  I should just run the board building check on the square and not build the board!?
   board =
     vecs:
     let
@@ -164,22 +164,19 @@ rec {
     ) height
   # |> builtins.map fill
   ;
-	
 
   predicate =
-    vecs:
-		vec:
+    vecs: vec:
     let
       edges_ = edges vecs;
       outline = edges_ |> builtins.map ({ left, right }: allIdx left right) |> lib.flatten;
     in
-    lib.elem vec outline || dawnRay'd edges_ vec
-  ;
+    lib.elem vec outline || dawnRay'd edges_ vec;
 
   visualizeBoard =
     board:
     board
-    |> builtins.map ( builtins.map (b: if b then "🟢" else "⚪"))
+    |> builtins.map (builtins.map (b: if b then "🟢" else "⚪"))
     |> builtins.map (lib.join "")
     |> lib.join "-";
 
