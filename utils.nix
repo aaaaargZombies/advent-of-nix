@@ -1,6 +1,8 @@
 { lib, ... }:
 rec {
   list = rec {
+    isEmpty = xs: builtins.length xs == 0;
+
     sum = builtins.foldl' (a: b: a + b) 0;
 
     fold_ = f: lst: builtins.foldl' f (at 0 lst) (lib.drop 1 lst);
@@ -274,9 +276,9 @@ rec {
 
     isEven = n: mod n 2 == 0;
 
-		toFloat = n: n + 0.0;
+    toFloat = n: n + 0.0;
 
-		div0 = n: d: if d == 0 then 0 else n / d;
+    div0 = n: d: if d == 0 then 0 else n / d;
 
     square = n: n * n;
 

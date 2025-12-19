@@ -36,7 +36,7 @@
           name = "show";
           runtimeInputs = [ ];
           text = ''
-            echo ${builtins.toJSON (day09.part01 day09.sampleInput)} 
+            echo ${builtins.toJSON (day09.input |> day09.parseInput |> day09.board |> lib.flatten |> builtins.length )} 
           '';
         };
 

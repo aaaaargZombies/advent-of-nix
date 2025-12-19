@@ -14,7 +14,7 @@ in
 rec {
 
   sampleInput = ''
-    			7,1
+    7,1
     11,1
     11,7
     9,7
@@ -24,8 +24,11 @@ rec {
     7,3
     	'';
 
+  lazyAll =
+    predicate: xss: lib.lists.foldr (acc: x: if acc && predicate x then true else false) true xss;
+
   expect01 = 50;
-  # expect02 = 6;
+  expect02 = 24;
   expectReal01 = 4741451444;
   # expectReal02 = 5941;
 
@@ -67,111 +70,118 @@ rec {
     |> list.max;
 
   /*
-            ..............
-            .......#XXX#..
-            .......X...X..
-            ..#XXXX#...X..
-            ..X........X..
-            ..#XXXXXX#.X..
-            .........X.X..
-            .........#X#..
-            ..............
+                    ..............
+                    .......#XXX#..
+                    .......X...X..
+                    ..#XXXX#...X..
+                    ..X........X..
+                    ..#XXXXXX#.X..
+                    .........X.X..
+                    .........#X#..
+                    ..............
 
-        		- biggest rect that fits in the outline.
-        		- a guess but looks like 3 corners need to be in our vec list.
+                		- biggest rect that fits in the outline.
+                		- a guess but looks like 3 corners need to be in our vec list.
 
-    	     FIX: 110178214 That's not the right answer; your answer is too low.
+            	     FIX: 110178214 your answer is too low.
+        					      458930826 your answer is too high
 
-    			 That didn't work, so maybe I just plot all the points.
+            			 That didn't work, so maybe I just plot all the points.
 
-    			 - moving down I take the frist two cords. fill in safe zone in between.
-    			 - I keep adding in safe zone as I move down
-    			 - if I hit more cords I fiter by x pos overlap.
-    			 - if both new cords are in the same x as last then it's the end.
+            			 - moving down I take the frist two cords. fill in safe zone in between.
+            			 - I keep adding in safe zone as I move down
+            			 - if I hit more cords I fiter by x pos overlap.
+            			 - if both new cords are in the same x as last then it's the end.
+
+    							 NOTE: had to look up to solution "ray casting" / point in polygon
   */
 
+  # take a list of bools, flip any gaps 00010010 -> 00011110
+  fill =
+    bools:
+    bools
+    |>
+      builtins.foldl'
+        (
+          {
+            left,
+            right,
+            collecting,
+          }:
+          b:
+          if collecting then
+            if b then
+              {
+                left = left ++ builtins.map (a: true) right ++ [ b ];
+                right = [ ];
+                collecting = false;
+              }
+            else
+              {
+                left = left;
+                right = right ++ [ b ];
+                collecting = true;
+              }
+          else if b then
+            {
+              left = left;
+              right = right ++ [ b ];
+              collecting = true;
+            }
+          else
+            {
+              left = left ++ [ b ];
+              right = right;
+              collecting = false;
+            }
+
+        )
+        {
+          left = [ ];
+          right = [ ];
+          collecting = false;
+        }
+    |> (a: a.left ++ a.right);
+
+  # FIX: building the board is what is extremely slow
+	#  it is 98219 long on it's y axis!
+	#  I am checking everything in the square against the board which is duplicate work
+	#  I should just run the board building check on the square and not build the board!?
   board =
     vecs:
     let
       width = vecs |> builtins.map (v: v.x) |> list.max |> (n: n + 1);
       height = vecs |> builtins.map (v: v.y) |> list.max |> (n: n + 1);
       edges_ = edges vecs;
+      outline = edges_ |> builtins.map ({ left, right }: allIdx left right) |> lib.flatten;
     in
     builtins.genList (
       y:
       builtins.genList (
-        x:
-        #NOTE: do stuff in here, how to keep state about last area we fill in?
-
-        # if lib.elem { inherit x y; } vecs then
-        #   "🔴"
-        # else 
-				if dawnRay'd edges_ (trace "VEC" { inherit x y; }) then
-          "🟢"
-        else
-          "⚪"
-
-        /*
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              ⚪⚪⚪⚪⚪⚪⚪🟢⚪⚪⚪🟢
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              ⚪⚪🟢⚪⚪⚪⚪🟢⚪⚪⚪⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              ⚪⚪🟢⚪⚪⚪⚪⚪⚪🟢⚪⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢⚪🟢
-
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              🟢🟢🟢🟢🟢🟢🟢🔴⚪⚪⚪🔴
-              ⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢⚪
-              ⚪⚪🔴🟢🟢🟢🟢🔴🟢🟢🟢⚪
-              ⚪⚪🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪
-              ⚪⚪🔴⚪⚪⚪⚪⚪⚪🔴🟢⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢⚪
-              🟢🟢🟢🟢🟢🟢🟢🟢🟢🔴🟢🔴
-
-							🟢🟢🟢⚪⚪⚪⚪⚪⚪⚪🟢🟢
-              ⚪⚪⚪🟢🟢🟢🟢🔴🟢🟢⚪🔴
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢
-              ⚪⚪🔴⚪⚪⚪⚪🔴⚪⚪🟢🟢
-              ⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢
-              ⚪⚪🔴⚪⚪⚪⚪⚪🟢🔴🟢🟢
-              🟢🟢🟢⚪⚪⚪⚪⚪🟢🟢🟢🟢
-              ⚪⚪⚪🟢🟢🟢🟢🟢⚪🔴⚪🔴
-
-
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-              🟢🟢🟢🟢🟢🟢🟢🔴🟢🟢🟢🔴⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢⚪
-              ⚪⚪🔴⚪⚪⚪⚪🔴🟢🟢🟢🟢⚪
-              ⚪⚪⚪🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪
-              ⚪⚪🔴🟢🟢🟢🟢🟢🟢🔴🟢🟢⚪
-              ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢⚪
-              🟢🟢🟢🟢🟢🟢🟢🟢🟢🔴⚪🔴⚪
-
-⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-🟢🟢🟢🟢🟢🟢🟢🔴🟢🟢🟢🔴
-⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢
-⚪⚪🔴⚪⚪⚪⚪🔴🟢🟢🟢🟢
-⚪⚪⚪🟢🟢🟢🟢🟢🟢🟢🟢🟢
-⚪⚪🔴🟢🟢🟢🟢🟢🟢🔴🟢🟢
-⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢
-🟢🟢🟢🟢🟢🟢🟢🟢🟢🔴⚪🔴
-
-⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪
-🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢
-⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢
-⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢🟢🟢
-⚪⚪⚪🟢🟢🟢🟢🟢🟢🟢🟢🟢
-⚪⚪⚪🟢🟢🟢🟢🟢🟢🟢🟢🟢
-⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🟢🟢
-🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪⚪
-
-
-*/
-
+        x: lib.elem { inherit x y; } outline || dawnRay'd edges_ { inherit x y; }
+        # lib.elem { inherit x y; } outline
       ) width
-    ) height;
+    ) height
+  # |> builtins.map fill
+  ;
+	
+
+  predicate =
+    vecs:
+		vec:
+    let
+      edges_ = edges vecs;
+      outline = edges_ |> builtins.map ({ left, right }: allIdx left right) |> lib.flatten;
+    in
+    lib.elem vec outline || dawnRay'd edges_ vec
+  ;
+
+  visualizeBoard =
+    board:
+    board
+    |> builtins.map ( builtins.map (b: if b then "🟢" else "⚪"))
+    |> builtins.map (lib.join "")
+    |> lib.join "-";
 
   edges =
     vecs:
@@ -191,20 +201,79 @@ rec {
       { left, right }:
       let
         # not below both points or above both points.
-        inCorrectXspace  = !((vec.y < left.y  && vec.y  < right.y ) || (vec.y  > left.y  && vec.y  > right.y ));
+        correctXspace = vec.y < left.y != vec.y < right.y;
         # inCorrectXspace = ((vec.y  < left.y  && vec.y  < right.y ) || (vec.y  > left.y  && vec.y  > right.y ));
         # point is before intersection of edge, traveling from low to high horizontally
         # Does the order of the points matter? should left.x always be less than right.x?
-        inCorrectYspace =
-          (vec.x ) <= trace "in slope???" (left.x )
-          + (math.div0 (math.toFloat (vec.y - left.y ))  (math.toFloat (right.y - left.y) )) * ((right.x ) - (left.x ));
+        correctYspace =
+          (vec.x)
+          < (right.x - left.x) * (vec.y - left.y) / (if right.y - vec.y == 0 then 1 else right.y - vec.y)
+          + left.x;
+        # FIX: can't devide by zero
       in
-      if inCorrectXspace /* && inCorrectYspace */ then count + 1 else count
-      # if inCorrectXspace then count + 1 else count
+      if correctXspace && correctYspace then count + 1 else count
     ) 0 edges
-		|> trace "COUNT"
     |> math.isEven
     |> bool.not;
 
-  part02 = input: input |> parseInput |> board |> builtins.map (lib.join "") |> lib.join "\n";
+  sortedByArea =
+    vecs:
+    vecs
+    |> list.combinations 2
+    |> builtins.sort (
+      a: b:
+      let
+        a1 = list.at 0 a;
+        a2 = list.at 1 a;
+        b1 = list.at 0 b;
+        b2 = list.at 1 b;
+        areaA = area a1 a2;
+        areaB = area b1 b2;
+      in
+      areaA > areaB
+    );
+
+  allIdx =
+    start: end:
+    let
+      xmin = lib.min start.x end.x;
+      xmax = lib.max start.x end.x;
+      ymin = lib.min start.y end.y;
+      ymax = lib.max start.y end.y;
+    in
+    builtins.genList (
+      y:
+      builtins.genList (x: {
+        x = x + xmin;
+        y = y + ymin;
+      }) (xmax - xmin + 1)
+    ) (ymax - ymin + 1)
+    |> lib.flatten;
+
+  pick =
+    board: sortedPairs:
+    if list.isEmpty sortedPairs then
+      0
+    else
+      let
+        fst = list.at 0 sortedPairs;
+        a = list.at 0 fst;
+        b = list.at 1 fst;
+        idxs = allIdx a b;
+        safe = idxs |> builtins.all (v: board |> list.at v.y |> list.at v.x);
+      in
+      if safe then area a b else pick board (lib.drop 1 sortedPairs);
+
+  part02 =
+    input:
+    input
+    |> parseInput
+    |> (
+      vecs:
+      let
+        pairs = sortedByArea vecs;
+        board_ = board vecs;
+      in
+      pick board_ pairs
+    );
 }
