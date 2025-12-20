@@ -96,53 +96,6 @@ rec {
     							 NOTE: had to look up to solution "ray casting" / point in polygon
   */
 
-  # take a list of bools, flip any gaps 00010010 -> 00011110
-  fill =
-    bools:
-    bools
-    |>
-      builtins.foldl'
-        (
-          {
-            left,
-            right,
-            collecting,
-          }:
-          b:
-          if collecting then
-            if b then
-              {
-                left = left ++ builtins.map (a: true) right ++ [ b ];
-                right = [ ];
-                collecting = false;
-              }
-            else
-              {
-                left = left;
-                right = right ++ [ b ];
-                collecting = true;
-              }
-          else if b then
-            {
-              left = left;
-              right = right ++ [ b ];
-              collecting = true;
-            }
-          else
-            {
-              left = left ++ [ b ];
-              right = right;
-              collecting = false;
-            }
-
-        )
-        {
-          left = [ ];
-          right = [ ];
-          collecting = false;
-        }
-    |> (a: a.left ++ a.right);
-
   # FIX: building the board is what is extremely slow
   #  it is 98219 long on it's y axis!
   #  I am checking everything in the square against the board which is duplicate work
@@ -159,7 +112,7 @@ rec {
       y:
       builtins.genList (
         x: lib.elem { inherit x y; } outline || dawnRay'd edges_ { inherit x y; }
-        # lib.elem { inherit x y; } outline
+        # x: lib.elem { inherit x y; } outline
       ) width
     ) height
   # |> builtins.map fill
@@ -247,19 +200,156 @@ rec {
     ) (ymax - ymin + 1)
     |> lib.flatten;
 
+  allIdxTrue =
+    start: end: pred:
+    let
+      xmin = lib.min start.x end.x;
+      xmax = lib.max start.x end.x;
+      ymin = lib.min start.y end.y;
+      ymax = lib.max start.y end.y;
+      doAllIdxTrue =
+        current:
+        if current.x == xmax && current.y == ymax then
+          pred current
+        else if pred current then
+          let
+            next =
+              if current.x == end.x then
+                {
+                  y = current.y + 1;
+                  x = xmin;
+                }
+              else
+                {
+                  y = current.y;
+                  x = current.x + 1;
+                };
+          in
+          doAllIdxTrue next end pred
+        else
+          false;
+    in
+    doAllIdxTrue {
+      x = xmin;
+      y = ymin;
+    };
+
+  allIdxTrue' =
+    start: end: pred:
+    let
+      toKey = { x, y }: "${builtins.toString x},${builtins.toString y}";
+      xmin = lib.min start.x end.x;
+      xmax = lib.max start.x end.x;
+      ymin = lib.min start.y end.y;
+      ymax = lib.max start.y end.y;
+      minVec = {
+        x = xmin;
+        y = ymin;
+      };
+      good =
+        builtins.genericClosure {
+          startSet = [
+            {
+              key = toKey minVec;
+              current = minVec;
+              state = pred minVec;
+            }
+          ];
+          operator =
+            item:
+            if !item.state then
+              [ ]
+            else if item.current.x == xmax && item.current.y == ymax then
+              [ ]
+            else
+              let
+                next =
+                  if item.current.x == xmax then
+                    {
+                      y = item.current.y + 1;
+                      x = xmin;
+                    }
+                  else
+                    {
+                      y = item.current.y;
+                      x = item.current.x + 1;
+                    };
+              in
+              [
+                {
+                  key = toKey next;
+                  current = next;
+                  state = pred next;
+                }
+              ];
+
+        }
+        |> lib.last
+        |> (a: a.state);
+    in
+    good;
+
+  fourCorners =
+    vecA: vecB:
+    let
+      vecAB = {
+        x = vecA.x;
+        y = vecB.y;
+      };
+      vecBA = {
+        x = vecB.x;
+        y = vecA.y;
+      };
+    in
+    [
+      vecA
+      vecAB
+      vecB
+      vecBA
+    ];
+
   pick =
-    board: sortedPairs:
+    pred: sortedPairs:
     if list.isEmpty sortedPairs then
       0
     else
       let
         fst = list.at 0 sortedPairs;
-        a = list.at 0 fst;
-        b = list.at 1 fst;
-        idxs = allIdx a b;
-        safe = idxs |> builtins.all (v: board |> list.at v.y |> list.at v.x);
+        a = trace "AAAAAAAA" <| list.at 0 fst;
+        b = trace "BBBBBBBB" <| list.at 1 fst;
+        # FIX: this is causing the crashout
+        idxs = trace "ALL IDXS" <| allIdx a b;
+        safe = idxs |> builtins.all pred;
+        safe_ =
+          fourCorners a b
+          |> edges
+          |> builtins.all ({ left, right }: allIdxTrue' left right pred)
+          |> trace "IS SAFE";
+        # NOTE: I only need to check the outline, like in the predicate function, I just need 4 edges of vecs, not the whole center.
+        # this ran for 45mins without exploding the memory!!!! but it also ran for 45mins¡¡¡¡¡
+        # safe_ = allIdxTrue' a b pred;
       in
-      if safe then area a b else pick board (lib.drop 1 sortedPairs);
+      if safe_ then area a b else pick pred (lib.drop 1 sortedPairs);
+
+  # only test corners
+  pick' =
+    pred: sortedPairs:
+    if list.isEmpty sortedPairs then
+      0
+    else
+      let
+        fst = list.at 0 sortedPairs;
+        a = trace "AAAAAAAA" <| list.at 0 fst;
+        b = trace "BBBBBBBB" <| list.at 1 fst;
+        # FIX: this is causing the crashout
+        idxs = trace "ALL IDXS" <| allIdx a b;
+        safe = idxs |> builtins.all pred;
+        safe_ = fourCorners a b |> builtins.all pred |> trace "IS SAFE";
+        # NOTE: I only need to check the outline, like in the predicate function, I just need 4 edges of vecs, not the whole center.
+        # this ran for 45mins without exploding the memory!!!! but it also ran for 45mins¡¡¡¡¡
+        # safe_ = allIdxTrue' a b pred;
+      in
+      if safe_ then area a b else pick pred (lib.drop 1 sortedPairs);
 
   part02 =
     input:
@@ -269,8 +359,8 @@ rec {
       vecs:
       let
         pairs = sortedByArea vecs;
-        board_ = board vecs;
+        isSafe = predicate vecs;
       in
-      pick board_ pairs
+      pick' isSafe pairs
     );
 }
