@@ -17,12 +17,86 @@ rec {
     [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}
   '';
 
-  # expect01 = 3;
-  # expect02 = 6;
-  # expectReal01 = 989;
+  expect01 = 7;
+  # expect02 = 33;
+  expectReal01 = 425;
   # expectReal02 = 5941;
-  #
-  # input = builtins.readFile ./input/day10.txt;
+
+  input = builtins.readFile ./input/day10.txt;
+
+  lightsToString = lights: lights |> lib.join "";
+
+  lightsInit = lights: lights |> builtins.map (_: ".");
+
+  joltsToString = jolts: jolts |> builtins.map builtins.toString |> lib.join ",";
+
+  joltsInit = jolts: jolts |> builtins.map (_: 0);
+
+  findButtonSequenceLights =
+    { lights, buttons, ... }:
+    builtins.genericClosure {
+      startSet = [
+        {
+          key = lights |> lightsInit |> lightsToString;
+          path = [ ];
+          state = lights |> lightsInit;
+        }
+      ];
+      operator =
+        item:
+        if item.key == (lightsToString lights) then
+          [ ]
+        else
+          builtins.map (
+            button:
+            let
+              nextState = pressButtonLights item.state button;
+            in
+            {
+              key = lightsToString nextState;
+              path = item.path ++ [ button ];
+              state = nextState;
+            }
+          ) buttons;
+    }
+    |> builtins.filter (item: item.key == lightsToString lights)
+    |> list.at 0;
+
+  # FIX: far too slow and memory hungry to by a usefull solution.
+  findButtonSequenceJolts =
+    { joltage, buttons, ... }:
+    let
+      goal = joltage |> joltsToString;
+      tooFar =
+        state: lib.zipListsWith (goal: current: goal < current) joltage state |> builtins.any (a: a);
+    in
+    builtins.genericClosure {
+      startSet = [
+        {
+          key = joltage |> joltsInit |> joltsToString;
+          path = [ ];
+          state = joltage |> joltsInit;
+        }
+      ];
+      operator =
+        item:
+        if item.key == goal || tooFar item.state then
+          [ ]
+        else
+          builtins.map (
+            button:
+            let
+              nextState = pressButtonJolts item.state button;
+            in
+            {
+              key = joltsToString nextState;
+              path = item.path ++ [ button ];
+              state = nextState;
+            }
+          ) buttons;
+    }
+    |> builtins.filter (item: item.key == goal)
+    |> list.at 0;
 
   toggleLight = char: if char == "#" then "." else "#";
 
@@ -38,7 +112,21 @@ rec {
     ) (tuple.pair [ ] 0) lights
     |> tuple.fst;
 
-  pressButton = light: button: builtins.foldl' toggleLights light button;
+  increaseJoltage =
+    jolts: idx:
+    builtins.foldl' (
+      { left, right }:
+      jolt:
+      if idx == right then
+        tuple.pair (left ++ [ (1 + jolt) ]) (right + 1)
+      else
+        tuple.pair (left ++ [ jolt ]) (right + 1)
+    ) (tuple.pair [ ] 0) jolts
+    |> tuple.fst;
+
+  pressButtonLights = lights: button: builtins.foldl' toggleLights lights button;
+
+  pressButtonJolts = jolts: button: builtins.foldl' increaseJoltage jolts button;
 
   toMachine =
     str:
@@ -57,15 +145,9 @@ rec {
         );
       joltage =
         lib.last parts
-        |> lib.stringToCharacters
-        |> builtins.filter (
-          c:
-          !(builtins.elem c [
-            "{"
-            ","
-            "}"
-          ])
-        );
+        |> builtins.replaceStrings [ "{" "}" ] [ "" "" ]
+        |> lib.splitString ","
+        |> builtins.map lib.toInt;
       buttons =
         parts
         |> lib.drop 1
@@ -82,6 +164,7 @@ rec {
               ")"
             ])
           )
+          |> builtins.map lib.toInt
         );
 
     in
@@ -91,8 +174,22 @@ rec {
 
   parseInput = str: str |> string.lines |> builtins.map toMachine;
 
-  part01 = input: input |> parseInput;
+  part01 =
+    input:
+    input
+    |> parseInput
+    |> builtins.map findButtonSequenceLights
+    |> builtins.map (item: item.path |> builtins.length)
+    |> list.sum;
 
-  part02 = input: input;
+  part02 =
+    input:
+    input
+    |> parseInput
+    |> lib.drop 1
+    |> lib.take 1
+    |> builtins.map findButtonSequenceJolts
+    |> builtins.map (item: item.path |> builtins.length)
+    |> list.sum;
 
 }

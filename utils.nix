@@ -27,6 +27,7 @@ rec {
       ) (tuple.pair 0 acc) xs
       |> tuple.snd;
 
+    # might be better with lib.zipListsWith
     map2 =
       f: xs: ys:
       foldl2 (
