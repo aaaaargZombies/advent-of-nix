@@ -332,6 +332,7 @@ rec {
       if safe_ then area a b else pick pred (lib.drop 1 sortedPairs);
 
   # only test corners
+  # NOTE: even only testing corners at current rate it will take about 42 years to complete 😭
   pick' =
     pred: sortedPairs:
     if list.isEmpty sortedPairs then
